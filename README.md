@@ -69,6 +69,6 @@
 4. ENJOY!上游更改三小时左右就会自动发起同步。
 
 ### 访问量
-
+test
 ![](http://profile-counter.glitch.me/BlueSkyClouds/count.svg)
 
