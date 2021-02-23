@@ -1,9 +1,9 @@
-name: 爱奇艺会员签到
+name: V2ex签到
 
 on:
     workflow_dispatch:
     schedule:
-        - cron: "*/20 16 * * *"
+        - cron: "0 14 * * *"
     watch:
         types: [started]
 
@@ -20,11 +20,11 @@ jobs:
             - name: npm install
               run: |
                   npm install
-            - name: "运行【爱奇艺会员签到】"
+            - name: "运行【V2ex自动签到】"
               run: |
-                  node function/iqiyi.js
+                  node function/v2ex.js
               env:
-                  iQIYI_COOKIE: ${{ secrets.iQIYI_COOKIE }}
+                  V2EXCK: ${{ secrets.V2EXCK }}
                   SEND_KEY: ${{ secrets.SEND_KEY }}
                   PUSH_KEY: ${{ secrets.PUSH_KEY }}
                   BARK_PUSH: ${{ secrets.BARK_PUSH }}

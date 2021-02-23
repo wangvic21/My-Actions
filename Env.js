@@ -292,7 +292,9 @@ function Env(name, opts) {
                         try {
                             if (resp.headers['set-cookie']) {
                                 const ck = resp.headers['set-cookie'].map(this.cktough.Cookie.parse).toString()
-                                this.ckjar.setCookieSync(ck, null)
+                                if (ck) {
+                                    this.ckjar.setCookieSync(ck, null)
+                                }
                                 nextOpts.cookieJar = this.ckjar
                             }
                         } catch (e) {
@@ -365,20 +367,22 @@ function Env(name, opts) {
          *    :$.time('yyyyMMddHHmmssS')
          *    y:年 M:月 d:日 q:季 H:时 m:分 s:秒 S:毫秒
          *    其中y可选0-4位占位符、S可选0-1位占位符，其余可选0-2位占位符
-         * @param {*} fmt 格式化参数
+         * @param {string} fmt 格式化参数
+         * @param {number} 可选: 根据指定时间戳返回格式化日期
          *
          */
-        time(fmt) {
+        time(fmt, ts = null) {
+            const date = ts ? new Date(ts) : new Date()
             let o = {
-                'M+': new Date().getMonth() + 1,
-                'd+': new Date().getDate(),
-                'H+': new Date().getHours(),
-                'm+': new Date().getMinutes(),
-                's+': new Date().getSeconds(),
-                'q+': Math.floor((new Date().getMonth() + 3) / 3),
-                'S': new Date().getMilliseconds()
+                'M+': date.getMonth() + 1,
+                'd+': date.getDate(),
+                'H+': date.getHours(),
+                'm+': date.getMinutes(),
+                's+': date.getSeconds(),
+                'q+': Math.floor((date.getMonth() + 3) / 3),
+                'S': date.getMilliseconds()
             }
-            if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (new Date().getFullYear() + '').substr(4 - RegExp.$1.length))
+            if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
             for (let k in o)
                 if (new RegExp('(' + k + ')').test(fmt))
                     fmt = fmt.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length))
@@ -433,12 +437,14 @@ function Env(name, opts) {
                     $notify(title, subt, desc, toEnvOpts(opts))
                 }
             }
-            let logs = ['', '==============📣系统通知📣==============']
-            logs.push(title)
-            subt ? logs.push(subt) : ''
-            desc ? logs.push(desc) : ''
-            console.log(logs.join('\n'))
-            this.logs = this.logs.concat(logs)
+            if (!this.isMuteLog) {
+                let logs = ['', '==============📣系统通知📣==============']
+                logs.push(title)
+                subt ? logs.push(subt) : ''
+                desc ? logs.push(desc) : ''
+                console.log(logs.join('\n'))
+                this.logs = this.logs.concat(logs)
+            }
         }
 
         log(...logs) {
